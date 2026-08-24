@@ -1,0 +1,15 @@
+{
+    "name": "espresso-dialin-engine",
+    "version": "0.1.0",
+    "description": "Client-side Espresso Dial-In Engine — minimal, modular, GitHub Pages friendly",
+    "private": true,
+    "scripts": {
+        "lint": "eslint . --ext .js",
+        "format": "prettier --write .",
+        "serve": "python3 -m http.server 8000"
+    },
+    "devDependencies": {
+        "eslint": "^8.0.0",
+        "prettier": "^2.8.0"
+    }
+}
