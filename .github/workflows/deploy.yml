@@ -16,13 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js (optional)
-        uses: actions/setup-node@v4
-        with:
-          # Updated to Node 24 to remove deprecation warnings
-          node-version: '24'
+        uses: actions/setup-node@v7
 
       - name: Install dependencies (if present)
         run: |
@@ -49,14 +46,14 @@ jobs:
           cp -r js _site/
 
       - name: Configure Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
         with:
           enablement: true
 
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: '_site'
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
