@@ -1,47 +1,46 @@
-# Espresso Dial-In Engine ☕️⚙️
+# Puck: The Espresso Dial-In Engine ☕️
 
-A playful, practical, and developer-friendly espresso dial-in tool.
+A playful, practical, and developer-friendly tool for dialing in the perfect
+shot of espresso. 
 
-Whether you chase bright citrus notes or syrupy sweetness, this tiny client-side app helps you iterate fast: tweak `dose`, `yield`, and `time`, and get prioritized recommendations from the decision engine.
+Whether you chase bright citrus notes or crave syrupy sweetness, this
+lightweight client-side app helps you iterate fast. Tweak your dose, yield, and
+time, select your taste profile, and let Puck's decision engine give you
+recommendations to rescue your extraction.
 
-Why you'll enjoy it
-- For coffee people: fast feedback and clear, prioritized advice (fix ratio first, then taste/time).
-- For tinkerers: modular ES modules, Alpine.js reactivity, minimal CSS, and a GitHub Actions workflow to auto-deploy to GitHub Pages.
+## Why You'll Love It
 
-Quick start
+*   **For Coffee Lovers:** Stop guessing. Puck gives you fast, prioritized
+    advice based on taste profiles (Sour, Bitter, Weak, Harsh). Fix your ratio
+    first, then tweak your grind and time.
+*   **Actionable Advice:** One-click "Apply suggestion" instantly updates your
+    target recipe based on real barista logic.
+*   **For Developers:** Built with modular ES modules, Alpine.js reactivity, and
+    Tailwind CSS. It is deliberately minimal and blazing fast.
+*   **Zero-Config Deployment:** Includes a GitHub Actions workflow
+    (`deploy.yml`) to bundle and auto-deploy static assets right to GitHub Pages
+    without exposing your config files.
+
+## The Stack & Setup
+
+Puck requires no heavy toolchains or build steps to run locally. Just serve the
+directory and start tinkering:
 
 ```bash
 cd path/to/coffee
-# serve locally (simple, no toolchain required)
+# Serve locally using Python's built-in server
 python3 -m http.server 8000
-# then open http://localhost:8000 in your browser
+# Open http://localhost:8000 in your browser
 ```
 
-Features (high level)
-- Dose / Yield / Time controls with presets and step buttons.
-- Decision engine: suggests actionable recipe changes (dose/yield/time), with one-click Apply + Undo.
-- Accessibility: ARIA labels, focus trapping for modal help, and keyboard-friendly controls.
-- Deployment: GitHub Actions workflow included for automatic Pages deployment.
+*   **UI & State:** `index.html` leverages Alpine.js for lightweight state
+    management and Tailwind for styling.
+*   **Logic:** `js/engine.js` handles the decision tree (taste vs. flow rate)
+    and `js/bootstrap.js` exposes it to the DOM.
+*   **Accessibility:** Fully keyboard-navigable with ARIA labels and focus
+    trapping for the help modal.
 
-Examples
-- Dial 1:2 Classic: choose the `Classic 1:2 Medium Roast` preset (18g → 36g). Pull a shot; if your ratio is off the engine suggests a fix — click `Apply suggestion` to update the recipe.
+## Contributing & Ideas
 
-Developer notes
-- Files:
-	- `index.html` — UI and Alpine bindings.
-	- `js/engine.js` — the decision engine logic.
-	- `js/bootstrap.js` — exposes `createEspresso()` to the global scope for Alpine.
-	- `css/app.css` — micro-interaction styles and layout tweaks.
-- Deploy: see `.github/workflows/deploy.yml` — pushes site files (`index.html`, `css/`, `js/`) to GitHub Pages on `main`.
-
-Extending the project (ideas)
-- Continuous sampling mode (record every N seconds during a pull).
-- Mini session history with thumbnails + export (CSV/JSON) for deeper analysis.
-
-Contributing
-- PRs welcome. Keep changes focused — the app is intentionally tiny and dependency-free. If you add a build step, update the GH Actions workflow to deploy the build output (recommended `dist/`).
-
-License
-- MIT — brew responsibly and have fun tinkering.
-
-Have a feature idea or a wild roast to test? Open an issue or a PR — I love both espresso and good code.
+Have a feature idea or a wild roast to test? Open an issue or a PR—let's brew
+some good code.
