@@ -3,10 +3,12 @@
     "version": "0.1.0",
     "description": "Client-side Espresso Dial-In Engine — minimal, modular, GitHub Pages friendly",
     "private": true,
+    "type": "module",
     "scripts": {
         "lint": "eslint . --ext .js",
         "format": "prettier --write .",
-        "serve": "python3 -m http.server 8000"
+        "serve": "python3 -m http.server 8000",
+        "test": "node --test test/engine.test.js"
     },
     "devDependencies": {
         "eslint": "^8.0.0",

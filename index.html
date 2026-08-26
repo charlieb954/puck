@@ -9,27 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        espresso: { 400: '#e8b86d', 500: '#d4924a' }
-                    }
-                }
-            }
-        }
-    </script>
     <link rel="stylesheet" href="css/app.css">
     <script type="module" src="js/bootstrap.js"></script>
     <script src="https://unpkg.com/alpinejs@3.14.2/dist/cdn.min.js" defer></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div class="app-root" x-data="espresso()" x-init="init()" @keydown.window.escape="showHelp=false">
-    <main role="main" class="dashboard-shell">
+    <div class="app-root" x-data="espresso()" x-init="init()" x-cloak @keydown.window.escape="closeHelp()">
+    <main class="dashboard-shell" :inert="showHelp">
         <header class="topbar">
             <div class="brand-block">
                 <div class="brand-row">
@@ -42,14 +29,23 @@
 
             <div class="header-actions">
                 <span class="status-pill">Dial-in</span>
-                <button @click="showHelp = true" :aria-expanded="showHelp" class="ghost-button" title="How it works" type="button">
-                    <i data-lucide="info"></i>
+                <button
+                    type="button"
+                    class="ghost-button"
+                    x-ref="helpBtn"
+                    aria-label="How it works"
+                    aria-haspopup="dialog"
+                    aria-controls="help-dialog"
+                    :aria-expanded="showHelp"
+                    @click="openHelp()"
+                >
+                    <span aria-hidden="true" x-html="icons.info"></span>
                 </button>
             </div>
         </header>
 
         <div class="content-grid">
-            <section class="panel controls-panel" aria-label="espresso controls">
+            <section class="panel controls-panel" aria-label="Espresso controls">
                 <div class="panel-head">
                     <div>
                         <span class="panel-kicker">Step 1</span>
@@ -61,46 +57,70 @@
                     <div class="control-card">
                         <div class="control-header control-header--split">
                             <div>
-                                <span class="control-label">Dose</span>
+                                <label class="control-label" for="dose-slider">Dose</label>
                                 <strong class="control-value" x-text="dose + 'g'"></strong>
                             </div>
                             <div class="control-meta">
-                                <span class="control-label">Ratio</span>
-                                <strong class="control-value" x-text="ratioDisplay"></strong>
+                                <span class="control-label" id="ratio-label">Ratio</span>
+                                <strong class="control-value" aria-labelledby="ratio-label" x-text="ratioDisplay"></strong>
                             </div>
                         </div>
-                        <input aria-label="Dose slider" type="range" min="12" max="24" step="0.5" x-model.number="dose"
-                            class="range-input" />
+                        <input
+                            id="dose-slider"
+                            class="range-input"
+                            type="range"
+                            :min="minDose"
+                            :max="maxDose"
+                            :step="stepDose"
+                            :aria-valuetext="dose + ' grams'"
+                            x-model.number="dose"
+                        />
                     </div>
 
                     <div class="control-card">
                         <div class="control-header control-header--split">
                             <div>
-                                <span class="control-label">Yield</span>
+                                <label class="control-label" for="yield-slider">Yield</label>
                                 <strong class="control-value" x-text="yieldOut + 'g'"></strong>
                             </div>
                             <div class="control-meta">
-                                <span class="control-label">Flow</span>
-                                <strong class="control-value" x-text="flow + ' g/s'"></strong>
+                                <span class="control-label" id="flow-label">Flow</span>
+                                <strong class="control-value" aria-labelledby="flow-label" x-text="flow + ' g/s'"></strong>
                             </div>
                         </div>
-                        <input aria-label="Yield slider" type="range" min="20" max="60" step="1"
-                            x-model.number="yieldOut" class="range-input" />
+                        <input
+                            id="yield-slider"
+                            class="range-input"
+                            type="range"
+                            :min="minYield"
+                            :max="maxYield"
+                            :step="stepYield"
+                            :aria-valuetext="yieldOut + ' grams'"
+                            x-model.number="yieldOut"
+                        />
                     </div>
 
                     <div class="control-card">
                         <div class="control-header">
                             <div>
-                                <span class="control-label">Time</span>
+                                <label class="control-label" for="time-slider">Time</label>
                                 <strong class="control-value" x-text="time + 's'"></strong>
                             </div>
                         </div>
-                        <input aria-label="Time slider" type="range" min="10" max="55" step="1" x-model.number="time"
-                            class="range-input" />
+                        <input
+                            id="time-slider"
+                            class="range-input"
+                            type="range"
+                            :min="minTime"
+                            :max="maxTime"
+                            :step="stepTime"
+                            :aria-valuetext="time + ' seconds'"
+                            x-model.number="time"
+                        />
                     </div>
-                    <label class="grind-field">
+                    <label class="grind-field" for="grind-select">
                         <span>Grind size</span>
-                        <select x-model="grindSize" aria-label="Grind size">
+                        <select id="grind-select" x-model="grindSize">
                             <option value="fine">Fine</option>
                             <option value="medium">Medium</option>
                             <option value="coarse">Coarse</option>
@@ -115,92 +135,67 @@
                     </div>
                 </div>
 
-                <div class="taste-panel" aria-label="taste profile selector">
+                <div class="taste-panel">
                     <div class="taste-panel-head">
                         <div>
                             <span class="panel-kicker">Step 2</span>
-                            <h3>Taste profile</h3>
+                            <h3 id="taste-heading">Taste profile</h3>
                         </div>
-                        <span class="taste-chip" x-text="taste.charAt(0).toUpperCase() + taste.slice(1)"></span>
+                        <span class="taste-chip" :class="{ muted: !taste }" x-text="tasteLabel"></span>
                     </div>
 
-                    <div class="taste-grid">
-                        <button @click="taste='sour'" @keydown.enter="taste='sour'" tabindex="0"
-                            :aria-pressed="taste==='sour'" :class="taste==='sour' ? 'taste-btn active' : 'taste-btn'"
-                            class="taste-btn" type="button">
-                            <span class="taste-icon" aria-hidden="true"><i data-lucide="sun-medium"></i></span>
-                            <span class="taste-copy">
-                                <b>Sour</b>
-                                <small>Bright / Citrusy</small>
-                            </span>
-                        </button>
-
-                        <button @click="taste='bitter'" @keydown.enter="taste='bitter'" tabindex="0"
-                            :aria-pressed="taste==='bitter'"
-                            :class="taste==='bitter' ? 'taste-btn active' : 'taste-btn'" class="taste-btn"
-                            type="button">
-                            <span class="taste-icon" aria-hidden="true"><i data-lucide="flame"></i></span>
-                            <span class="taste-copy">
-                                <b>Bitter</b>
-                                <small>Dry / Astringent</small>
-                            </span>
-                        </button>
-
-                        <button @click="taste='weak'" @keydown.enter="taste='weak'" tabindex="0"
-                            :aria-pressed="taste==='weak'" :class="taste==='weak' ? 'taste-btn active' : 'taste-btn'"
-                            class="taste-btn" type="button">
-                            <span class="taste-icon" aria-hidden="true"><i data-lucide="droplets"></i></span>
-                            <span class="taste-copy">
-                                <b>Weak</b>
-                                <small>Thin / Lacking body</small>
-                            </span>
-                        </button>
-
-                        <button @click="taste='harsh'" @keydown.enter="taste='harsh'" tabindex="0"
-                            :aria-pressed="taste==='harsh'" :class="taste==='harsh' ? 'taste-btn active' : 'taste-btn'"
-                            class="taste-btn" type="button">
-                            <span class="taste-icon" aria-hidden="true"><i data-lucide="zap"></i></span>
-                            <span class="taste-copy">
-                                <b>Harsh</b>
-                                <small>Overpowering</small>
-                            </span>
-                        </button>
-
-                        <button @click="taste='balanced'" @keydown.enter="taste='balanced'" tabindex="0"
-                            :aria-pressed="taste==='balanced'"
-                            :class="taste==='balanced' ? 'taste-btn active balanced' : 'taste-btn'" class="taste-btn"
-                            type="button">
-                            <span class="taste-icon" aria-hidden="true"><i data-lucide="coffee"></i></span>
-                            <span class="taste-copy">
-                                <b>Balanced</b>
-                                <small>Sweet / Full body</small>
-                            </span>
-                        </button>
+                    <div
+                        class="taste-grid"
+                        role="radiogroup"
+                        aria-labelledby="taste-heading"
+                    >
+                        <template x-for="(option, index) in tastes" :key="option.id">
+                            <button
+                                type="button"
+                                class="taste-btn"
+                                role="radio"
+                                :data-taste="option.id"
+                                :aria-checked="taste === option.id"
+                                :tabindex="taste === option.id || (!taste && index === 0) ? 0 : -1"
+                                :class="{ active: taste === option.id, balanced: taste === option.id && option.id === 'balanced' }"
+                                @click="selectTaste(option.id)"
+                                @keydown="onTasteKey($event, index)"
+                            >
+                                <span class="taste-icon" aria-hidden="true" x-html="option.icon"></span>
+                                <span class="taste-copy">
+                                    <b x-text="option.label"></b>
+                                    <small x-text="option.hint"></small>
+                                </span>
+                            </button>
+                        </template>
                     </div>
                 </div>
             </section>
 
-            <div class="panel recommendation-panel" role="status" aria-live="polite">
+            <section class="panel recommendation-panel" aria-label="Recommendation">
                 <div class="panel-head compact">
                     <div>
                         <span class="panel-kicker">Step 3</span>
                         <h2>Recommendation</h2>
                     </div>
-                    <span class="pulse-indicator" :class="recommendation.hasSuggestion ? '' : 'muted'"
-                        aria-hidden="true"></span>
+                    <span class="pulse-indicator" :class="recommendation.hasSuggestion ? '' : 'muted'" aria-hidden="true"></span>
                 </div>
 
-                <div class="recommendation-body">
-                    <div class="primary-recommendation" x-text="recommendation.primary"></div>
+                <div class="recommendation-body" aria-live="polite" aria-atomic="true">
+                    <div class="primary-recommendation" :class="{ muted: !taste }" x-text="recommendation.primary"></div>
                     <p x-text="recommendation.reason"></p>
                 </div>
 
-                <div class="recommendation-cta">
-                    <button x-show="recommendation.hasSuggestion" @click="applySuggestion()" class="apply-button"
-                        type="button">Apply suggestion</button>
+                <div class="recommendation-cta" x-show="recommendation.hasSuggestion" x-cloak>
+                    <button
+                        type="button"
+                        class="apply-button"
+                        :aria-label="'Apply suggestion: ' + recommendation.targetDisplay"
+                        @click="applySuggestion()"
+                    >Apply suggestion</button>
                 </div>
 
-                <div class="target-strip" x-show="recommendation.hasSuggestion">
+                <div class="target-strip" x-show="recommendation.hasSuggestion" x-cloak>
                     <div class="target-block">
                         <span>Current</span>
                         <strong x-text="recipeSummary"></strong>
@@ -210,35 +205,50 @@
                         <strong x-text="recommendation.targetDisplay"></strong>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     </main>
 
-        <div x-show="showHelp" x-cloak class="help-overlay">
-            <div class="help-backdrop" @click="showHelp = false" aria-hidden="true"></div>
-            <div role="dialog" aria-modal="true" aria-labelledby="how-title" x-transition x-ref="modal"
-                x-trap="showHelp" x-effect="if(showHelp){ $nextTick(()=> $refs.closeBtn.focus()) }"
-                x-transition:enter="transform transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                x-transition:leave="transform transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                class="help-modal">
+        <div
+            x-show="showHelp"
+            x-cloak
+            x-transition.opacity.duration.200ms
+            class="help-overlay"
+        >
+            <div class="help-backdrop" @click="closeHelp()" aria-hidden="true"></div>
+            <div
+                id="help-dialog"
+                class="help-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="how-title"
+                x-ref="modal"
+                tabindex="-1"
+            >
                 <div class="help-header">
                     <div>
                         <h3 id="how-title">How it works</h3>
                         <p>Quick steps to dial in an espresso shot</p>
                     </div>
-                    <button x-ref="closeBtn" @click="showHelp = false" class="close-button" type="button" aria-label="Close">✕</button>
+                    <button
+                        type="button"
+                        class="close-button"
+                        x-ref="closeBtn"
+                        aria-label="Close help"
+                        @click="closeHelp()"
+                    >
+                        <span aria-hidden="true" x-html="icons.close"></span>
+                    </button>
                 </div>
                 <ol>
-                    <li>Set your dose and expected yield using the sliders.</li>
-                    <li>Adjust extraction time to match your machine and watch flow and ratio.</li>
-                    <li>Select the taste profile that best matches the shot you tasted.</li>
-                    <li>Follow the prioritized recommendation — ratio is highlighted first.</li>
-                    <li>Tweak grind, dose, or yield until the shot lands on balanced.</li>
+                    <li>Set the dose, yield, time, and grind you actually pulled.</li>
+                    <li>Watch ratio and flow as you match the shot on the machine.</li>
+                    <li>Choose the taste that best matches the cup.</li>
+                    <li>Apply one suggestion at a time — ratio first, then grind, then time or yield.</li>
+                    <li>Taste again and repeat until the shot lands on balanced.</li>
                 </ol>
                 <div class="help-actions">
-                    <button @click="showHelp = false" type="button" class="primary-button">Got it</button>
+                    <button type="button" class="primary-button" @click="closeHelp()">Got it</button>
                 </div>
             </div>
         </div>
